@@ -1,0 +1,34 @@
+,
+"Ingredient Name in English",Dendroxine
+2D-Structure,
+"Molecular Formula",C17H25NO3
+"Molecular Weight",291.38529
+ALogP,2.225
+LogD,2.218
+"Molecular Solubility",-1.747
+"Molecular Volume",208.2
+"Molecular Surface Area",264.13
+"Molecular Polar Surface Area",38.76
+"Num Rotatable Bonds",1
+"Num H Acceptors",4
+"Num H Donors",0
+"ADMET Absorption Level",0
+"ADMET BBB Level",2
+"ADMET BBB",-0.076
+"ADMET Solubility",-4.47
+"ADMET Solubility Level",2
+"ADMET Hepatotoxicity",1
+"ADMET Hepatotoxicity Probability",0.549
+"ADMET CYP2D6",0
+"ADMET CYP2D6 Probability",0.356
+"ADMET PPB Level",0
+"Druglikeness Weight",0.695
+"Druglikeness Grading",Good
+"Candidate Target Genes","This ingredient hao no candidate target genes with the prediction confidence index more than 0.80."
+"Diseases Associated with This Ingredient",NA
+"CAS No.",N/A
+"External Link to PubChem",5316539
+"External Link to ChEMBL",N/A
+References,N/A
+"Herbs Containing This Ingredient","SHI HU"
+"Formulas Containing This Ingredient","TONG MAI BAO GAO, HU PO HUAN QING WAN, FU FANG XIAN SHI HU KE LI, XIAO ER JIN SHI PIAN, AN SHEN WAN, QIANG JIN YING XIONG WAN, ZHI HONG WAN, BA BAO ZHI HONG WAN, TIAO JING BAI DAI WAN, ZHUANG GU WAN, FU FANG SHI HU PIAN, HAN WEN BI WAN (TIAN MA QU FENG WAN ), MAI LUO NING ZHU SHE YE, MO LUO DAN, MING JING DI HUANG WAN, YU BIAO WAN, KUN BAO WAN, YU FENG DAN, LING YANG QING FEI WAN, YUN FU QING HUO WAN, WU JI WAN, WEI AN JIAO NANG, LING YANG QING FEI KE LI, SHI HU MING MU WAN, WAN LING PIAN, TE LING YAN YAO, SHAN JI DA BU JIU, TONG SAI MAI PIAN, YIN XU WEI TONG PIAN, NING SOU WAN, QIANG XIN WAN, JIN SANG QING YIN WAN, BAO AN WAN LING DAN (BAO AN WAN LING WAN ), XIAO CUO WAN, JIE ER WAN LING WAN, ZHUANG YUAN SHEN HAI LONG JIU, FU MING PIAN, YIN XU WEI TONG KE LI, YU LU BAO FEI WAN, QING LIN WAN"

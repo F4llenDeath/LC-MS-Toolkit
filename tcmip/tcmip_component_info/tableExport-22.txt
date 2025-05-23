@@ -1,0 +1,34 @@
+,
+"Ingredient Name in English",Hircinol
+2D-Structure,
+"Molecular Formula",C15H14O3
+"Molecular Weight",242.26985
+ALogP,3.448
+LogD,3.447
+"Molecular Solubility",-3.386
+"Molecular Volume",159.49
+"Molecular Surface Area",230.14
+"Molecular Polar Surface Area",49.69
+"Num Rotatable Bonds",1
+"Num H Acceptors",3
+"Num H Donors",2
+"ADMET Absorption Level",0
+"ADMET BBB Level",1
+"ADMET BBB",0.112
+"ADMET Solubility",-3.736
+"ADMET Solubility Level",3
+"ADMET Hepatotoxicity",1
+"ADMET Hepatotoxicity Probability",0.88
+"ADMET CYP2D6",0
+"ADMET CYP2D6 Probability",0.346
+"ADMET PPB Level",2
+"Druglikeness Weight",0.805
+"Druglikeness Grading",Good
+"Candidate Target Genes","This ingredient hao no candidate target genes with the prediction confidence index more than 0.80."
+"Diseases Associated with This Ingredient",NA
+"CAS No.",41060-05-3
+"External Link to PubChem",442705
+"External Link to ChEMBL",CHEMBL475652
+References,N/A
+"Herbs Containing This Ingredient","SHI HU"
+"Formulas Containing This Ingredient","TONG MAI BAO GAO, HU PO HUAN QING WAN, FU FANG XIAN SHI HU KE LI, XIAO ER JIN SHI PIAN, AN SHEN WAN, QIANG JIN YING XIONG WAN, ZHI HONG WAN, BA BAO ZHI HONG WAN, TIAO JING BAI DAI WAN, ZHUANG GU WAN, FU FANG SHI HU PIAN, HAN WEN BI WAN (TIAN MA QU FENG WAN ), MAI LUO NING ZHU SHE YE, MO LUO DAN, MING JING DI HUANG WAN, YU BIAO WAN, KUN BAO WAN, YU FENG DAN, LING YANG QING FEI WAN, YUN FU QING HUO WAN, WU JI WAN, WEI AN JIAO NANG, LING YANG QING FEI KE LI, SHI HU MING MU WAN, WAN LING PIAN, TE LING YAN YAO, SHAN JI DA BU JIU, TONG SAI MAI PIAN, YIN XU WEI TONG PIAN, NING SOU WAN, QIANG XIN WAN, JIN SANG QING YIN WAN, BAO AN WAN LING DAN (BAO AN WAN LING WAN ), XIAO CUO WAN, JIE ER WAN LING WAN, ZHUANG YUAN SHEN HAI LONG JIU, FU MING PIAN, YIN XU WEI TONG KE LI, YU LU BAO FEI WAN, QING LIN WAN"
