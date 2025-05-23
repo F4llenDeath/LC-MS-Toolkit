@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
-"""Aggregate manual component info exports into a single CSV file containing only the three main fields: Ingredient Name in English, Molecular Formula, and Molecular Weight."""
 import csv
 import glob
 import os
 
 def find_component_folder():
-    """Locate the directory containing the exported component files."""
     for name in os.listdir('.'):
-        if os.path.isdir(name) and name.lower().startswith('component info'):
+        if os.path.isdir(name) and name.lower().startswith('tcmip_component_info'):
             return name
     raise FileNotFoundError("Could not find a directory starting with 'component info'")
 
 def extract_index(path):
-    """Extract numeric index from 'tableExport-<N>.txt'; default to 0 for the base file."""
     base = os.path.basename(path)
     stem = base[len('tableExport'):-len('.txt')]
     if stem.startswith('-'):
@@ -23,7 +20,6 @@ def extract_index(path):
     return 0
 
 def parse_fields(filepath, fields):
-    """Parse only the specified fields from a table export file."""
     data = {}
     with open(filepath, newline='', encoding='utf-8') as f:
         reader = csv.reader(f)

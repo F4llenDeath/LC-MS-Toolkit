@@ -34,7 +34,6 @@ def main():
             raise RuntimeError(f"Timed out loading {SHIHU_URL!r} after {PAGE_LOAD_TIMEOUT}s")
         wait = WebDriverWait(driver, ELEMENT_WAIT_TIMEOUT)
 
-        # Load component links from static table or fallback to accordion panel
         try:
             table = wait.until(EC.presence_of_element_located((By.ID, "comta")))
             component_links = table.find_elements(By.CSS_SELECTOR, "td a.tdcolor")
@@ -55,10 +54,8 @@ def main():
             if not href:
                 continue
 
-            # Navigate to the component page
             driver.get(href)
 
-            # 5) Extract the four fields
             def get_text_by_label(label_text):
                 try:
                     table = driver.find_element(By.ID, "table")
@@ -101,15 +98,12 @@ def main():
                 "Molecular Weight": weight,
             })
 
-            # go back to the herb page (or reopen it)
             driver.back()
-            
-            # re-expand the Components panel
+
             wait.until(EC.element_to_be_clickable(
                 (By.XPATH, "//a[text()='Components']"))).click()
             time.sleep(0.2)
 
-        # 6) Dump to Excel
         df = pd.DataFrame(results)
         df.to_excel(OUTPUT_FILE, index=False)
         print(f"Done! {len(df)} components written to {OUTPUT_FILE!r}")
