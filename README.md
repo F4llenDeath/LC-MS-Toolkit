@@ -9,6 +9,8 @@ Currently support:
     1. Metabolite and natural products list are directly downloaded from the site. `merge_pubchem_csv.py` merges these two lists.
     2. After generating `pubchem/pubchem_raw.csv`, you can scrape the molecular weight and formula for each chemical URL (handling KNApSAcK, NPASS, and Wikidata layouts) with `scrape_mw_formula.py`
 
+A short script `merge_final_csvs.py` is availabel in `final` folder which merges the pubchem and tcmip dataset outcomes.
+
 ## Prerequisites
 
 - Google Chrome browser installed.

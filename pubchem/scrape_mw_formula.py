@@ -30,10 +30,6 @@ def setup_driver(headless=False):
 
 
 def get_text_label_in_table(driver, label):
-    """
-    Find a table row where the first cell matches `label` exactly,
-    and return the text of the second cell, or None if not found.
-    """
     try:
         row = driver.find_element(
             By.XPATH,
