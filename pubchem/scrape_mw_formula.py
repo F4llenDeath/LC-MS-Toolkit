@@ -11,25 +11,32 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
-PAGE_LOAD_TIMEOUT = 30
-DEFAULT_PAUSE = 1.0
+PAGE_LOAD_TIMEOUT = 30  # how long to wait for a page to load
+DEFAULT_PAUSE = 1.0   # seconds to wait between scrapes to avoid overloading servers
 
 def setup_driver(headless=False):
+
+    # Finds the chromedriver executable in your system
     chromedriver_path = shutil.which("chromedriver")
     if not chromedriver_path:
         sys.exit("ERROR: chromedriver executable not found in PATH.")
+
+    # Sets up Chrome options (headless if requested)
     options = webdriver.ChromeOptions()
     options.page_load_strategy = 'eager'
     if headless:
         options.add_argument('--headless=new')
         options.add_argument('--disable-gpu')
+
+    # Returns a webdriver.Chrome instance
     service = Service(chromedriver_path)
     driver = webdriver.Chrome(service=service, options=options)
-    # driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)   //npass websites are really slow
+    # driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)   # npass websites are really slow
     return driver
 
-
-def get_text_label_in_table(driver, label):
+# Looks in a table for a row with the given label and gets the corresponding value from the same row
+# Find any table row <tr> where the first cell (whether it's a <th> or <td>) exactly matches the label.
+def get_text_label_in_table(driver, label):   
     try:
         row = driver.find_element(
             By.XPATH,
@@ -39,7 +46,8 @@ def get_text_label_in_table(driver, label):
     except NoSuchElementException:
         return None
 
-
+# Parser for Knapsack
+# Extracts Formula and Mw from chemical entry pages on knapsackfamily.com using table-based scraping
 def parse_knapsack(driver):
     formula = get_text_label_in_table(driver, 'Formula')
     weight = get_text_label_in_table(driver, 'Mw')
@@ -47,7 +55,8 @@ def parse_knapsack(driver):
         weight = get_text_label_in_table(driver, 'Molecular weight')
     return weight, formula
 
-
+# Parser for NPASS
+# Extracts Formula and Molecular Weight from npass.bidd.group using <dt>/<dd> tags and fallbacks to table parsing if needed
 def parse_npass(driver):
     try:
         formula = driver.find_element(
@@ -78,7 +87,11 @@ def parse_npass(driver):
 
     return weight, formula
 
-
+# Parser for Wikidata
+# Uses the Wikidata API to extract:
+#   P274: chemical formula
+#   P2067: molecular weight
+# Handles potential nested dictionary responses
 def parse_wikidata(entity_id):
     import urllib.request, json
 
@@ -105,7 +118,7 @@ def parse_wikidata(entity_id):
         print(f"WARNING: failed to fetch Wikidata {entity_id}: {e}", file=sys.stderr)
         return None, None
 
-
+# Dispatcher: Determine Which Parser to Use
 def dispatch_parse(driver, url):
     hostname = urlparse(url).hostname or ''
     if 'knapsackfamily.com' in hostname:
@@ -122,21 +135,30 @@ def dispatch_parse(driver, url):
 
 
 def main(input_csv, output_csv, pause, headless):
-    df = pd.read_csv(input_csv)
+    # Load input CSV (must have Source_Chemical_URL column)
+    df = pd.read_csv(input_csv) 
+
+    # Add empty columns: Molecular_Weight, Formula
     df['Molecular_Weight'] = None
-    df['Formula'] = None
+    df['Formula'] = None 
 
     driver = setup_driver(headless=headless)
     try:
         for idx, row in df.iterrows():
+            # Extract URL
             url = row.get('Source_Chemical_URL')
             if not isinstance(url, str) or not url.startswith('http'):
                 continue
-
+            
+            # Use dispatch_parse() to get weight + formula
             weight, formula = dispatch_parse(driver, url)
+
+            # Store results in DataFrame
             df.at[idx, 'Molecular_Weight'] = weight
             df.at[idx, 'Formula'] = formula
             print(f"[{idx+1}/{len(df)}] {url} -> Mw={weight}, Formula={formula}")
+
+            # Wait pause seconds to avoid overloading servers
             time.sleep(pause)
     finally:
         driver.quit()
@@ -144,7 +166,7 @@ def main(input_csv, output_csv, pause, headless):
     df.to_csv(output_csv, index=False)
     print(f"Results written to {output_csv}")
 
-
+# Command-line Interface
 if __name__ == '__main__':
     p = argparse.ArgumentParser(
         description='Scrape molecular weight and formula for pubchem chemicals.'
