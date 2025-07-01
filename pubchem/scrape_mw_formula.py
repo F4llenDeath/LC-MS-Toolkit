@@ -58,6 +58,8 @@ def parse_knapsack(driver):
 # Parser for NPASS
 # Extracts Formula and Molecular Weight from npass.bidd.group using <dt>/<dd> tags and fallbacks to table parsing if needed
 def parse_npass(driver):
+
+    # Try extracting formula from <dt>/<dd>
     try:
         formula = driver.find_element(
             By.XPATH,
@@ -65,6 +67,8 @@ def parse_npass(driver):
         ).text.strip()
     except NoSuchElementException:
         formula = None
+    
+    # Try extracting weight from <dt>/<dd>
     try:
         weight = driver.find_element(
             By.XPATH,
@@ -135,7 +139,7 @@ def dispatch_parse(driver, url):
 
 
 def main(input_csv, output_csv, pause, headless):
-    # Load input CSV (must have Source_Chemical_URL column)
+    # Ensure 'Source_Chemical_URL' column exists in the input CSV
     df = pd.read_csv(input_csv) 
 
     # Add empty columns: Molecular_Weight, Formula
