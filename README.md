@@ -15,20 +15,21 @@ Work in progress for more supported databases
 
 ## 2 · Chromatogram Processing (`HPLC-cluster-analysis/`)
 
-`process_peak_tables.py` converts **Shimadzu LabSolutions TXT exports** into a tidy sample × feature matrix.
+### `process_peak_tables.py` 
+converts **Shimadzu LabSolutions TXT exports** into a tidy sample × feature matrix.
 
 ```
 python HPLC-cluster-analysis/process_peak_tables.py \
-    --input-dir raw-data \
-    --out-prefix results/peak_matrix \
+    --input-dir raw-data-dir \
+    --out-prefix \
     --norm               # optional: total-area normalisation (ppm)
     --tol 0.15           # RT tolerance in minutes (default 0.15)
 ```
 
 Outputs:
 
-* `results/peak_matrix_raw.csv`   — unnormalised peak areas  
-* `results/peak_matrix_norm_ppm.csv` (if `--norm`)   — total-area-normalised  
+* `peak_matrix_raw.csv`   — unnormalised peak areas  
+* `peak_matrix_norm_ppm.csv` (if `--norm`)   — total-area-normalised  
 
 The script:
 
@@ -37,7 +38,24 @@ The script:
 3. Clusters retention times within ± `tol` min to build consensus features
 4. Returns a DataFrame (rows = samples, cols = consensus RTs) and writes CSV
 
-The resulting matrix is ready for PCA, hierarchical clustering, PLS-DA, etc.
+### `pca_clustering.py`
+
+Light-weight PCA + hierarchical clustering utility for the peak-area matrices created by `process_peak_tables.py`.
+
+```
+python analysis/pca_clustering.py \
+        --matrix matrix-path \
+        --out-dir \
+        --presence 0.5     # keep peaks present in ≥50 % samples
+        --log              # log10(x+1) transform
+        --autoscale        # mean-centre & unit variance
+```
+
+Outputs: 
+* `pca_scores.csv`
+* `pca_loadings.csv`
+* `pca_scores_plot.png`
+* `heatmap_cluster.png`
 
 ## 3 · Dependencies
 

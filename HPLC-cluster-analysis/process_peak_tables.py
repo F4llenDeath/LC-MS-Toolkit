@@ -77,7 +77,7 @@ def build_matrix(
     cols = [f"{rt:.2f}" for rt in features]
     data = []
 
-    for df in sample_tables.items():
+    for sample, df in sample_tables.items():
         row = []
         for f_rt in features:
             # For each feature RT it searches df for a peak whose RT is within ± tol minutes of that centroid
@@ -94,7 +94,6 @@ def main() -> None:
     )
     parser.add_argument(
         "--input-dir",
-        default="HPLC-cluster-anal/raw",
         help="Directory containing *.txt peak-table files",
     )
     parser.add_argument(
@@ -105,7 +104,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--out-prefix",
-        default="HPLC-cluster-anal/peak_matrix",
+        default="peak_matrix",
         help="Prefix for output CSV files",
     )
     parser.add_argument(
