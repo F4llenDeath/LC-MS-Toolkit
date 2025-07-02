@@ -1,20 +1,56 @@
-# LCMS_data_scrape
+# LC-MS Toolkit
 
-A data scraping project for LC-MS analysis reference database on major Chinese medicine datasets.
+This repository covers some LC-MS related toolkit for a small-molecule study on herbs
+1. Web scraping of phytochemical references
+2. Automated processing of raw HPLC/LC-MS chromatograms
 
-Currently support:
-1. Basic information of herb chemical components from [ECTM](http://www.tcmip.cn/ETCM)
-    1. temip.cn seems to have anti-scraping implemented, If you've manually downloaded component info (the `tableExport*.txt` files) into the `component info` directory, you can aggregate fields into a single CSV with `tcmip_txt_to_csv.py`
-2. Information of herb chemical components from [ncbi](https://pubchem.ncbi.nlm.nih.gov/taxonomy/94219#section=Natural-Products)
-    1. Metabolite and natural products list are directly downloaded from the site. `merge_pubchem_csv.py` merges these two lists.
-    2. After generating `pubchem/pubchem_raw.csv`, you can scrape the molecular weight and formula for each chemical URL (handling KNApSAcK, NPASS, and Wikidata layouts) with `scrape_mw_formula.py`
+## 1 · Reference-Database Scraping (`web-crawler/`)
 
-A short script `merge_final_csvs.py` is availabel in `final` folder which merges the pubchem and tcmip dataset outcomes.
+| Folder | Purpose | Main scripts |
+| ------ | ------- | ------------ |
+| `tcmip/`  | Parse ETCM/TCMIP herb component lists. | `tcmip_txt_to_csv.py` |
+| `pubchem/`| Merge PubChem *Metabolites* + *Natural Products* and scrape mol-weight / formula from external DB pages. | `merge_pubchem_csv.py`, `scrape_mw_formula.py` |
 
-## Prerequisites
+Work in progress for more supported databases
 
-- Google Chrome browser installed.
-- ChromeDriver executable installed and available on PATH.
-- python libraries installed:
-    - pandas
-    - selenium
+## 2 · Chromatogram Processing (`HPLC-cluster-analysis/`)
+
+`process_peak_tables.py` converts **Shimadzu LabSolutions TXT exports** into a tidy sample × feature matrix.
+
+```
+python HPLC-cluster-analysis/process_peak_tables.py \
+    --input-dir raw-data \
+    --out-prefix results/peak_matrix \
+    --norm               # optional: total-area normalisation (ppm)
+    --tol 0.15           # RT tolerance in minutes (default 0.15)
+```
+
+Outputs:
+
+* `results/peak_matrix_raw.csv`   — unnormalised peak areas  
+* `results/peak_matrix_norm_ppm.csv` (if `--norm`)   — total-area-normalised  
+
+The script:
+
+1. Reads every TXT in `--input-dir`
+2. Extracts `[Peak Table]` blocks (columns: `R.Time`, `Area`)
+3. Clusters retention times within ± `tol` min to build consensus features
+4. Returns a DataFrame (rows = samples, cols = consensus RTs) and writes CSV
+
+The resulting matrix is ready for PCA, hierarchical clustering, PLS-DA, etc.
+
+## 3 · Dependencies
+
+* Python ≥ 3.9  
+* **Core analysis**: 
+    - `numpy`
+    - `pandas`  
+* **Web scraping**: 
+    - `requests`
+    - `lxml`
+    - `selenium`
+    - a local Chrome/Chromium + ChromeDriver
+
+```bash
+pip install -r requirements.txt        
+```
