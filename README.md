@@ -4,19 +4,19 @@ This repository covers some LC-MS related toolkit for a small-molecule study on 
 1. Web scraping of phytochemical references
 2. Automated processing of raw HPLC/LC-MS chromatograms
 
-## 1 · Reference-Database Scraping (`web-crawler/`)
+## 1. Reference-Database Scraping (`web-crawler/`)
 
 | Folder | Purpose | Main scripts |
 | ------ | ------- | ------------ |
 | `tcmip/`  | Parse ETCM/TCMIP herb component lists. | `tcmip_txt_to_csv.py` |
-| `pubchem/`| Merge PubChem *Metabolites* + *Natural Products* and scrape mol-weight / formula from external DB pages. | `merge_pubchem_csv.py`, `scrape_mw_formula.py` |
+| `pubchem/`| Merge PubChem *Metabolites* + *Natural Products* and scrape mol-weight / formula from external DB pages. | `merge_pubchem_csv.py`, `scrape_mw_formula.py`, `pug_rest_api.py` |
 
 Work in progress for more supported databases
 
-## 2 · Chromatogram Processing (`HPLC-cluster-analysis/`)
+## 2. Chromatogram Processing (`HPLC-cluster-analysis/`)
 
 ### `process_peak_tables.py` 
-converts **Shimadzu LabSolutions TXT exports** into a tidy sample × feature matrix.
+converts Shimadzu LabSolutions TXT exports into a tidy sample × feature matrix.
 
 ```
 python HPLC-cluster-analysis/process_peak_tables.py \
@@ -57,18 +57,20 @@ Outputs:
 * `pca_scores_plot.png`
 * `heatmap_cluster.png`
 
-## 3 · Dependencies
+## 3. Dependencies
 
 * Python ≥ 3.9  
 * **Core analysis**: 
     - `numpy`
     - `pandas`  
+    - `scikit-learn`
 * **Web scraping**: 
     - `requests`
     - `lxml`
     - `selenium`
+    - `requests`
     - a local Chrome/Chromium + ChromeDriver
 
-```bash
+```
 pip install -r requirements.txt        
 ```

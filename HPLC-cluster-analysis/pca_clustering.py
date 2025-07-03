@@ -8,12 +8,14 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 
 # helpers
+
+# log10(x+1)  
 def log_transform(df: pd.DataFrame) -> pd.DataFrame:
     return np.log10(df + 1.0)
 
+# z-score (mean-centre, unit variance)
 def autoscale(df: pd.DataFrame) -> pd.DataFrame:
     return (df - df.mean()) / df.std(ddof=0)
-
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="PCA + clustering of peak matrix")
@@ -31,7 +33,7 @@ def main() -> None:
 
     # load matrix
     X = pd.read_csv(args.matrix, index_col=0)
-    print(f"Loaded matrix   shape={X.shape}")
+    print(f"Loaded matrix shape={X.shape}")
 
     # filter by presence
     if args.presence > 0:
