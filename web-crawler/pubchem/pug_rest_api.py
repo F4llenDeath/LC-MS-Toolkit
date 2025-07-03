@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
 python web-crawler/pubchem/pug_rest_api.py \
-    --input results/crawler/metabolites.csv \
+    --input results/crawler/pubchem_raw.csv \
     --id-column name \
     --output results/crawler/metabolites_with_pubchem.csv \
     --props MolecularFormula,MolecularWeight \
     --batch-size 100 \
     --sleep 0.2 \
     --cache pubchem_props_cache.csv
+    --auto-delete-cache
 """
 
 import argparse
@@ -27,7 +28,8 @@ SESSION.headers.update({"User-Agent": "LCMS_toolkit/1.0"})
 
 def pug_request(namespace: str, ids: List[str], props: str, retries: int = 3) -> Dict[str, Dict[str, str]]:
     url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/{namespace}/property/{props}/JSON"
-    payload = {namespace: ids, "property": props}
+    # PubChem expects a comma-separated string for batch IDs
+    payload = {namespace: ",".join(ids), "property": props}
     backoff = 1.0
 
     for attempt in range(retries):
@@ -73,6 +75,8 @@ def main() -> None:
     ap.add_argument("--batch-size", type=int, default=100, help="IDs per request (max 100)")
     ap.add_argument("--sleep", type=float, default=0.2, help="Pause between requests (s)")
     ap.add_argument("--cache", help="Optional CSV cache of previous calls")
+    ap.add_argument("--auto-delete-cache", action="store_true",
+                    help="Remove cache file after successful run")
     args = ap.parse_args()
 
     in_path = Path(args.input)
@@ -83,7 +87,11 @@ def main() -> None:
     if args.id_column not in df.columns:
         sys.exit(f"Column {args.id_column!r} not found in {in_path}")
 
-    ids = df[args.id_column].astype(str).tolist()
+    # ensure CID keys are clean strings without '.0'
+    if args.cid:
+        ids = df[args.id_column].astype(int).astype(str).tolist()
+    else:
+        ids = df[args.id_column].astype(str).tolist()
     namespace = "cid" if args.cid else "name"
 
     # load cache if present
@@ -110,13 +118,20 @@ def main() -> None:
     # save cache
     if cache_path:
         save_cache(cache, cache_path)
+        # optionally remove cache file after run
+        if args.auto_delete_cache and cache_path.exists():
+            cache_path.unlink()
+            print("Deleted cache", cache_path)
 
     # add columns back to DataFrame
     prop_names = args.props.split(",")
     for prop in prop_names:
-        df[prop] = df[args.id_column].astype(str).map(
-            lambda x: cache.get(x, {}).get(prop, "")
+        key_series = (
+            df[args.id_column].astype(int).astype(str)
+            if args.cid
+            else df[args.id_column].astype(str)
         )
+        df[prop] = key_series.map(lambda x: cache.get(x, {}).get(prop, ""))
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out_path, index=False)
