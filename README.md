@@ -76,6 +76,7 @@ python analysis/pca_clustering.py \
         --presence 0.5     # keep peaks present in ≥50 % samples
         --log              # log10(x+1) transform
         --autoscale        # mean-centre & unit variance
+        --k-clusters       # number of clusters for grouping scores plot
 ```
 
 Outputs: 
