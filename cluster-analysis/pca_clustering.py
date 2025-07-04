@@ -14,14 +14,18 @@ import itertools
 
 # helpers
 
-# log10(x+1)  
+# log10(x+1)
+
+
 def log_transform(df: pd.DataFrame) -> pd.DataFrame:
     return np.log10(df + 1.0)
 
 # z-score (mean-centre, unit variance)
 
+
 def autoscale(df: pd.DataFrame) -> pd.DataFrame:
     return (df - df.mean()) / df.std(ddof=0)
+
 
 def confidence_ellipse(x, y, ax, n_std=2.0, **kwargs):
     if len(x) != len(y):
@@ -36,12 +40,13 @@ def confidence_ellipse(x, y, ax, n_std=2.0, **kwargs):
     ax.add_patch(ellipse)
     return ellipse
 
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="PCA + clustering of peak matrix")
+    parser = argparse.ArgumentParser(
+        description="PCA + clustering of peak matrix")
     parser.add_argument("--matrix", required=True, help="CSV matrix from process_peak_tables.py")
     parser.add_argument("--out-dir", default="results", help="directory for outputs")
-    parser.add_argument("--presence", type=float, default=0.0,
-                        help="retain peaks present (area>0) in ≥ fraction of samples (0-1)")
+    parser.add_argument("--presence", type=float, default=0.0, help="retain peaks present (area>0) in ≥ fraction of samples (0-1)")
     parser.add_argument("--log", action="store_true", help="apply log10(x+1) transform")
     parser.add_argument("--autoscale", action="store_true", help="mean-centre & unit variance")
     parser.add_argument("--components", type=int, default=3, help="number of PCA components")
@@ -91,7 +96,6 @@ def main() -> None:
     loadings.to_csv(loadings_path)
     print("Saved:", scores_path, loadings_path)
 
-
     # PCA scores plot with group-based styling
     # derive cluster groups from hierarchical clustering
     Z = sch.linkage(X.values, metric="euclidean", method="ward")
@@ -118,16 +122,11 @@ def main() -> None:
         idx = groups == i
         color = palette[i - 1]
         marker = next(markers)
-        ax.scatter(scores_df.loc[idx, 'PC1'], scores_df.loc[idx, 'PC2'], s=70,
-                   facecolor=color, edgecolor='k', marker=marker, label=f"Cluster {i}")
-        confidence_ellipse(scores_df.loc[idx, 'PC1'], scores_df.loc[idx, 'PC2'], ax,
-                           edgecolor=color, facecolor='none', linestyle='--', linewidth=1.2)
+        ax.scatter(scores_df.loc[idx, 'PC1'], scores_df.loc[idx, 'PC2'], s=70, facecolor=color, edgecolor='k', marker=marker, label=f"Cluster {i}")
+        confidence_ellipse(scores_df.loc[idx, 'PC1'], scores_df.loc[idx, 'PC2'], ax, edgecolor=color, facecolor='none', linestyle='--', linewidth=1.2)
+
     # overall ellipse
-    confidence_ellipse(scores_df['PC1'], scores_df['PC2'], ax,
-                       edgecolor='0.5', facecolor='none', linestyle='-', linewidth=1.5)
-
-
-
+    confidence_ellipse(scores_df['PC1'], scores_df['PC2'], ax, edgecolor='0.5', facecolor='none', linestyle='-', linewidth=1.5)
 
     # annotate points
     for txt in scores_df.index:
@@ -152,7 +151,61 @@ def main() -> None:
     pca_plot = out_dir / "pca_scores_plot.png"
     plt.savefig(pca_plot, dpi=300)
     plt.close()
+
     print("Saved:", pca_plot)
+
+
+    # additional PCA biplot figure with loadings arrows
+    fig2, ax2 = plt.subplots(figsize=(7, 6))
+    markers2 = itertools.cycle(['o', 's', '^', 'd', 'v', '<', '>', 'p', 'h'])
+    # compute top 10 variable loadings & scale for arrows
+    top10 = loadings.abs().sum(axis=1).nlargest(10).index
+    x_max, x_min = scores_df['PC1'].max(), scores_df['PC1'].min()
+    y_max, y_min = scores_df['PC2'].max(), scores_df['PC2'].min()
+    scale = 0.5 * max(x_max - x_min, y_max - y_min)
+    # reuse same styling for scores
+    ax2.spines['top'].set_visible(False)
+    ax2.spines['right'].set_visible(False)
+    ax2.spines['left'].set_position(('outward', 0))
+    ax2.spines['bottom'].set_position(('outward', 0))
+    ax2.axhline(0, color='gray', linewidth=0.8, zorder=0)
+    ax2.axvline(0, color='gray', linewidth=0.8, zorder=0)
+    ax2.xaxis.set_ticks_position('bottom')
+    ax2.yaxis.set_ticks_position('left')
+    ax2.tick_params(direction='out', labelsize=9)
+    # axis arrows
+    arrow_fmt = dict(arrowstyle='->', color='k', mutation_scale=10)
+    ax2.annotate('', xy=(1, 0), xytext=(0, 0), xycoords='axes fraction', textcoords='axes fraction', arrowprops=arrow_fmt)
+    ax2.annotate('', xy=(0, 1), xytext=(0, 0), xycoords='axes fraction', textcoords='axes fraction', arrowprops=arrow_fmt)
+    # plot scores by cluster
+    for i in range(1, args.k_clusters + 1):
+        idx = groups == i
+        color = palette[i - 1]
+        marker = next(markers2)
+        ax2.scatter(scores_df.loc[idx, 'PC1'], scores_df.loc[idx, 'PC2'], s=70, facecolor=color, edgecolor='k', marker=marker)
+    # overall ellipse
+    confidence_ellipse(scores_df['PC1'], scores_df['PC2'], ax2, edgecolor='0.5', facecolor='none', linestyle='-', linewidth=1.5)
+
+    # loadings arrows (scaled by √eigenvalues)
+    for var in top10:
+        dx = loadings.loc[var, 'PC1'] * np.sqrt(pca.explained_variance_[0]) * scale
+        dy = loadings.loc[var, 'PC2'] * np.sqrt(pca.explained_variance_[1]) * scale
+        ax2.arrow(0, 0, dx, dy, color='red', alpha=0.8, width=0.005, length_includes_head=True)
+    ax2.set_xlabel(f"PC1 ({pca.explained_variance_ratio_[0] * 100:.1f} %)")
+    ax2.set_ylabel(f"PC2 ({pca.explained_variance_ratio_[1] * 100:.1f} %)")
+
+    ax2.set_title("PCA biplot")
+    # annotate sample points to the right of markers
+    for txt in scores_df.index:
+        x, y = scores_df.loc[txt, ['PC1', 'PC2']]
+        ax2.text(x + 0.5, y, txt, fontsize=9)
+    # cluster legend on outer border
+    ax2.legend(frameon=False, loc='upper right', bbox_to_anchor=(1.0, 1.0))
+    plt.tight_layout()
+    biplot_file = out_dir / "pca_biplot.png"
+    plt.savefig(biplot_file, dpi=300)
+    plt.close()
+    print("Saved:", biplot_file)
 
     # hierarchical cluster heatmap (Ward, Euclidean)
     sns.clustermap(X, metric="euclidean", method="ward", cmap="viridis", figsize=(8, 8))
