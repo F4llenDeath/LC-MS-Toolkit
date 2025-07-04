@@ -7,25 +7,18 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 import scipy.cluster.hierarchy as sch
-from scipy.stats import chi2
 from matplotlib.patches import Ellipse
-import matplotlib.transforms as transforms
 import itertools
 
 # helpers
 
 # log10(x+1)
-
-
 def log_transform(df: pd.DataFrame) -> pd.DataFrame:
     return np.log10(df + 1.0)
 
 # z-score (mean-centre, unit variance)
-
-
 def autoscale(df: pd.DataFrame) -> pd.DataFrame:
     return (df - df.mean()) / df.std(ddof=0)
-
 
 def confidence_ellipse(x, y, ax, n_std=2.0, **kwargs):
     if len(x) != len(y):
@@ -39,7 +32,6 @@ def confidence_ellipse(x, y, ax, n_std=2.0, **kwargs):
     ellipse = Ellipse((np.mean(x), np.mean(y)), width, height, angle=theta, **kwargs)
     ax.add_patch(ellipse)
     return ellipse
-
 
 def main() -> None:
     parser = argparse.ArgumentParser(
@@ -131,7 +123,6 @@ def main() -> None:
     # annotate points
     for txt in scores_df.index:
         x, y = scores_df.loc[txt, ['PC1', 'PC2']]
-
         # offset all labels to the right of the point
         dx = 0.5
         dy = 0.0

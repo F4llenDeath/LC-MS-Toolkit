@@ -40,7 +40,7 @@ The script:
 
 Work in progress for more supported databases
 
-## 2. Chromatogram Processing (`HPLC-cluster-analysis/`)
+## 2. Chromatogram Processing (`cluster-analysis/`)
 
 ### `process_peak_tables.py` 
 converts Shimadzu LabSolutions TXT exports into a tidy sample × feature matrix.
@@ -83,9 +83,25 @@ Outputs:
 * `pca_scores.csv`
 * `pca_loadings.csv`
 * `pca_scores_plot.png`
+* `pca_biplot.png`
 * `heatmap_cluster.png`
 
 Work in progress for more cluster analysis techniques
+
+### `opls_da.py`
+Exploratory PLS-DA with leave-one-out cross-validation and VIP scoring:
+
+```
+python cluster-analysis/opls_da.py \
+    --matrix results/cluster_analysis/dendro_run1_norm_ppm.csv \
+    --out-dir results/cluster_analysis \
+    --n-pred 1 \
+    --top-n 20
+```
+
+Outputs:
+* `plda_vip_scores.csv` — VIP score table  
+* `plda_vip_bar.png` — Bar chart of VIP scores with error bars  
 
 ## 3. Dependencies
 

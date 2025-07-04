@@ -6,4 +6,3 @@ scikit-learn>=1.4
 requests>=2.32
 lxml>=5.2
 selenium>=4.20   # requires a matching Chrome/Chromium + chromedriver
-requests
