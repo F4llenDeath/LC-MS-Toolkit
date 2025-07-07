@@ -86,10 +86,8 @@ Outputs:
 * `pca_biplot.png`
 * `heatmap_cluster.png`
 
-Work in progress for more cluster analysis techniques
-
 ### `opls_da.py`
-Exploratory PLS-DA with leave-one-out cross-validation and VIP scoring:
+Exploratory PLS-DA with leave-one-out cross-validation and VIP scoring.
 
 ```
 python cluster-analysis/opls_da.py \
@@ -100,8 +98,10 @@ python cluster-analysis/opls_da.py \
 ```
 
 Outputs:
-* `plda_vip_scores.csv` — VIP score table  
-* `plda_vip_bar.png` — Bar chart of VIP scores with error bars  
+* `plda_vip_scores.csv` 
+* `plda_vip_bar.png` 
+
+Work in progress for more cluster analysis techniques
 
 ## 3. Dependencies
 
@@ -119,3 +119,7 @@ Outputs:
 ```
 pip install -r requirements.txt        
 ```
+
+## Acknowledgements
+
+I sincerely thank [Prof. Lina Chen](https://english.njmu.edu.cn/_t965/2019/0129/c11686a142685/page.htm) and her lab at [NJMU](https://www.njmu.edu.cn) for generously providing the raw chemical data used in this project.

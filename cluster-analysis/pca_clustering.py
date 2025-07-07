@@ -23,6 +23,22 @@ def autoscale(df: pd.DataFrame) -> pd.DataFrame:
 def confidence_ellipse(x, y, ax, n_std=2.0, **kwargs):
     if len(x) != len(y):
         raise ValueError("x and y must be the same length")
+    
+    if len(x) == 2:
+        # Special case: only 2 points
+        x0, x1 = x
+        y0, y1 = y
+        mean_x = (x0 + x1) / 2
+        mean_y = (y0 + y1) / 2
+        dx = x1 - x0
+        dy = y1 - y0
+        width = n_std * np.hypot(dx, dy)
+        height = 2  # hardcoded height
+        theta = np.degrees(np.arctan2(dy, dx))
+        ellipse = Ellipse((mean_x, mean_y), width, height, angle=theta, **kwargs)
+        ax.add_patch(ellipse)
+        return ellipse
+    
     cov = np.cov(x, y)
     vals, vecs = np.linalg.eigh(cov)
     order = vals.argsort()[::-1]
@@ -92,6 +108,10 @@ def main() -> None:
     # derive cluster groups from hierarchical clustering
     Z = sch.linkage(X.values, metric="euclidean", method="ward")
     groups = sch.fcluster(Z, t=args.k_clusters, criterion="maxclust")
+    # export sample-to-cluster mapping for downstream analyses
+    pd.DataFrame({'sample': X.index, 'cluster': groups}).to_csv(
+        out_dir / 'sample_clusters.csv', index=False
+    )
     # colors and markers
     palette = sns.color_palette("tab10", args.k_clusters)
     markers = itertools.cycle(['o', 's', '^', 'd', 'v', '<', '>', 'p', 'h'])
@@ -199,9 +219,13 @@ def main() -> None:
     print("Saved:", biplot_file)
 
     # hierarchical cluster heatmap (Ward, Euclidean)
-    sns.clustermap(X, metric="euclidean", method="ward", cmap="viridis", figsize=(8, 8))
+    cg = sns.clustermap(X.T, metric="euclidean", method="ward", cmap="viridis", figsize=(8, 8))
+    cg.ax_heatmap.set_xlabel("Sample Type")
+    cg.ax_heatmap.set_ylabel("Retention Time")
+    plt.setp(cg.ax_heatmap.get_xticklabels(), rotation=45, ha='right')
+    plt.setp(cg.ax_heatmap.get_yticklabels(), rotation=0)
     heatmap_path = out_dir / "heatmap_cluster.png"
-    plt.savefig(heatmap_path, dpi=300)
+    cg.savefig(heatmap_path, dpi=300)
     plt.close()
     print("Saved:", heatmap_path)
 

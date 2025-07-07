@@ -8,12 +8,6 @@ from sklearn.cross_decomposition import PLSRegression
 from sklearn.model_selection import LeaveOneOut
 from sklearn.metrics import r2_score
 
-# map sample names to cluster labels
-CLUSTER_MAP = {
-    "liusu": 1, "mabian": 1, "yequ": 1,
-    "jinchai": 2, "tiepi": 2, "qujing": 2,
-    "huoshan": 3
-}
 
 def vip_scores(pls, X, Y):
     T = pls.x_scores_
@@ -31,6 +25,7 @@ def vip_scores(pls, X, Y):
 def main():
     parser = argparse.ArgumentParser(description="Exploratory PLS-DA with VIP scoring")
     parser.add_argument("--matrix", required=True, help="CSV data matrix (rows=samples, cols=features)")
+    parser.add_argument("--map-file", required=True, help="CSV file mapping samples to clusters")
     parser.add_argument("--out-dir", default="results", help="Directory for outputs")
     parser.add_argument("--n-pred", type=int, default=1, help="Number of predictive components")
     parser.add_argument("--top-n", type=int, default=20, help="Number of top features to plot")
@@ -42,8 +37,9 @@ def main():
     # load data
     data = pd.read_csv(args.matrix, index_col=0)
     X = data.values
-    sample_names = data.index.to_list()
-    y = pd.Series(sample_names).map(CLUSTER_MAP).values
+    # load sample-to-cluster mapping
+    map_df = pd.read_csv(args.map_file).set_index('sample')['cluster']
+    y = data.index.to_series().map(map_df).values
 
     # z-score
     scaler = StandardScaler()
