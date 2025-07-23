@@ -66,11 +66,11 @@ def main():
 
     print(f"Saved VIP scores: {vip_out}")
 
-    # plot top 10 VIP scores as bar chart
+    # plot top n VIP scores as bar chart
     import matplotlib.pyplot as plt
-    top10_vip = vip_series.sort_values(ascending=False).head(args.top_n)
+    top_n_vip = vip_series.sort_values(ascending=False).head(args.top_n)
     fig, ax = plt.subplots(figsize=(8, 5))
-    ax.bar(top10_vip.index.astype(str), top10_vip.values, color='skyblue', edgecolor='k')
+    ax.bar(top_n_vip.index.astype(str), top_n_vip.values, color='skyblue', edgecolor='k')
     ax.set_xlabel("Features")
     ax.set_ylabel("VIP Score")
     ax.set_title("Top VIP Scores")

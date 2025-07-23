@@ -71,7 +71,7 @@ Light-weight PCA + hierarchical clustering utility for the peak-area matrices cr
 
 ```
 python analysis/pca_clustering.py \
-        --matrix matrix-path \
+        --matrix matrix-file \
         --out-dir \
         --presence 0.5     # keep peaks present in ≥50 % samples
         --log              # log10(x+1) transform
@@ -85,14 +85,16 @@ Outputs:
 * `pca_scores_plot.png`
 * `pca_biplot.png`
 * `heatmap_cluster.png`
+* `sample_clusters.csv`
 
 ### `opls_da.py`
 Exploratory PLS-DA with leave-one-out cross-validation and VIP scoring.
 
 ```
 python cluster-analysis/opls_da.py \
-    --matrix results/cluster_analysis/dendro_run1_norm_ppm.csv \
-    --out-dir results/cluster_analysis \
+    --matrix matrix-file \
+    --map-file sample_clusters.csv \
+    --out-dir  \
     --n-pred 1 \
     --top-n 20
 ```
