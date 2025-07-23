@@ -6,6 +6,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
+from sklearn.model_selection import LeaveOneOut
+from sklearn.metrics import r2_score
 import scipy.cluster.hierarchy as sch
 from matplotlib.patches import Ellipse
 import itertools
@@ -83,6 +85,17 @@ def main() -> None:
     if args.autoscale:
         X = autoscale(X)
         print("Applied autoscaling")
+
+    # leave-one-out CV for PCA reconstruction R²
+    Xz = X.values
+    loo = LeaveOneOut()
+    Xhat = np.empty_like(Xz)
+    for train, test in loo.split(Xz):
+        pca_cv = PCA(n_components=args.components, random_state=1)
+        pca_cv.fit(Xz[train])
+        Xhat[test] = pca_cv.inverse_transform(pca_cv.transform(Xz[test]))
+    cv_r2 = r2_score(Xz.flatten(), Xhat.flatten())
+    print(f"LOO PCA reconstruction R²: {cv_r2:.3f}")
 
     # PCA
     pca = PCA(n_components=args.components, random_state=1)
