@@ -3,6 +3,7 @@
 This repository covers some LC-MS related toolkit for a small-molecule study on herbs
 1. Web scraping of phytochemical references
 2. Automated processing of raw HPLC/LC-MS chromatograms
+3. Lightweight cluster analysis tools
 
 ## 1. Reference-Database Scraping (`web-crawler/`)
 
@@ -87,11 +88,11 @@ Outputs:
 * `heatmap_cluster.png`
 * `sample_clusters.csv`
 
-### `opls_da.py`
+### `pls_da.py`
 Exploratory PLS-DA with leave-one-out cross-validation and VIP scoring.
 
 ```
-python cluster-analysis/opls_da.py \
+python cluster-analysis/pls_da.py \
     --matrix matrix-file \
     --map-file sample_clusters.csv \
     --out-dir  \
