@@ -7,6 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.model_selection import LeaveOneOut
+from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import r2_score
 import scipy.cluster.hierarchy as sch
 from matplotlib.patches import Ellipse
@@ -87,15 +88,25 @@ def main() -> None:
         print("Applied autoscaling")
 
     # leave-one-out CV for PCA reconstruction R²
-    Xz = X.values
+    X_arr = X.values
     loo = LeaveOneOut()
-    Xhat = np.empty_like(Xz)
-    for train, test in loo.split(Xz):
+    PRESS = 0.0
+    TSS = 0.0
+    for train, test in loo.split(X_arr):
+        # Fit scaling on TRAIN only
+        scaler = StandardScaler(with_mean=True, with_std=True)
+        Xtr_sc = scaler.fit_transform(X_arr[train])
+        Xte_sc = scaler.transform(X_arr[test])
+        # Fit PCA on TRAIN (scaled)
         pca_cv = PCA(n_components=args.components, random_state=1)
-        pca_cv.fit(Xz[train])
-        Xhat[test] = pca_cv.inverse_transform(pca_cv.transform(Xz[test]))
-    cv_r2 = r2_score(Xz.flatten(), Xhat.flatten())
-    print(f"LOO PCA reconstruction R²: {cv_r2:.3f}")
+        pca_cv.fit(Xtr_sc)
+        # Reconstruct TEST in scaled space
+        Xte_sc_hat = pca_cv.inverse_transform(pca_cv.transform(Xte_sc))
+        # Accumulate PRESS and TSS in scaled space
+        PRESS += np.sum((Xte_sc - Xte_sc_hat) ** 2)
+        TSS   += np.sum(Xte_sc ** 2)
+    Q2 = 1.0 - PRESS / TSS
+    print(f"Q²: {Q2:.3f}")
 
     # PCA
     pca = PCA(n_components=args.components, random_state=1)
@@ -179,10 +190,10 @@ def main() -> None:
 
     # hierarchical cluster heatmap (Ward, Euclidean)
     cg = sns.clustermap(X.T, metric="euclidean", method="ward", cmap="bwr", figsize=(8, 8))
-    cg.ax_heatmap.set_xlabel("Sample Type")
-    cg.ax_heatmap.set_ylabel("Retention Time")
-    plt.setp(cg.ax_heatmap.get_xticklabels(), rotation=45, ha='right')
-    plt.setp(cg.ax_heatmap.get_yticklabels(), rotation=0)
+    cg.ax_heatmap.set_xlabel("Sample", fontsize=14)
+    cg.ax_heatmap.set_ylabel("Retention Time/min", fontsize=14)
+    plt.setp(cg.ax_heatmap.get_xticklabels(), rotation=45, ha='right', fontsize=14)
+    plt.setp(cg.ax_heatmap.get_yticklabels(), rotation=0, fontsize=14)
     heatmap_path = out_dir / "heatmap_cluster.png"
     cg.savefig(heatmap_path, dpi=300)
     plt.close()
