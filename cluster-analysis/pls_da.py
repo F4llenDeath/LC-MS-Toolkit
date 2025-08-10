@@ -52,7 +52,7 @@ def main():
         pls = PLSRegression(n_components=args.n_pred)
         pls.fit(Xz[train], y[train])
         preds[test] = pls.predict(Xz[test]).ravel()
-    print(f"LOO R2: {r2_score(y, preds):.3f}")
+    print(f"LOO R²: {r2_score(y, preds):.3f}")
 
     # final model on full data
     pls_final = PLSRegression(n_components=args.n_pred)
